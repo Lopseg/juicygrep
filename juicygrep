@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Verifica se o número de argumentos é válido
+if [ $# -ne 2 ]; then
+  echo "Uso: juicygrep arquivo_de_entrada lista_de_endpoints"
+  exit 1
+fi
+
+# Armazena os argumentos em variáveis
+input_file=$1
+endpoints_file=$2
+
+# Verifica se o arquivo de entrada existe
+if [ ! -f $input_file ]; then
+  echo "Arquivo de entrada não encontrado: $input_file"
+  exit 1
+fi
+
+# Cria o arquivo de saída
+output_file="${input_file}.filtered"
+echo "" > $output_file
+
+# Lê a lista de endpoints interessantes e armazena em um array
+endpoints=($(cat $endpoints_file))
+
+# Lê o arquivo de entrada linha por linha
+while read line; do
+  # Verifica se a URL contém algum dos endpoints interessantes
+  for endpoint in "${endpoints[@]}"; do
+    if echo $line | grep -q $endpoint; then
+      # Se a URL contiver um endpoint interessante, adiciona ao arquivo de saída
+      echo $line >> $output_file
+      break
+    fi
+  done
+done < $input_file
+
+echo "Arquivo filtrado salvo em: $output_file"
