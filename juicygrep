@@ -23,13 +23,33 @@ echo "" > $output_file
 # Lê a lista de endpoints interessantes e armazena em um array
 endpoints=($(cat $endpoints_file))
 
+# Define o tamanho da barra de progresso
+bar_size=50
+
+# Calcula o número total de URLs a processar
+total=$(wc -l < "$input_file")
+
+# Loop que processa as URLs e atualiza a barra de progresso
+count=0
 # Lê o arquivo de entrada linha por linha
 while read line; do
+  # Incrementa o contador de URLs processadas
+  count=$((count + 1))
+
+  # Calcula o número de caracteres preenchidos na barra de progresso
+  filled=$((count * bar_size / total))
+
+  # Calcula o número de caracteres vazios na barra de progresso
+  empty=$((bar_size - filled))
+
+  # Escreve a barra de progresso na tela
+  printf "[%${filled}s%${empty}s] %d/%d\r" ">" " " $count $total
   # Verifica se a URL contém algum dos endpoints interessantes
   for endpoint in "${endpoints[@]}"; do
-    if echo $line | grep -q $endpoint; then
+    if echo $line | grep -qF "$endpoint"; then
       # Se a URL contiver um endpoint interessante, adiciona ao arquivo de saída
-      echo $line >> $output_file
+      	echo $line
+      	echo $line >> $output_file
       break
     fi
   done
